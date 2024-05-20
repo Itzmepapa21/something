@@ -17,4 +17,4 @@ WORKDIR /app
 COPY --from=builder /app/your_bot_script.py .
 
 # Entrypoint to run your bot script
-CMD ["python", "your_bot_script.py"]
+CMD ["python", "bot.py"]
