@@ -1,0 +1,16 @@
+{
+    "name": "AutoAnimeBot",
+    "description": "Upload Ongoing Animes In Negligible Size... Automatically",
+    "logo": "https://graph.org/file/ad1b25807b81cdf1dff65.jpg",
+    "keywords": ["Telegram","python", "anime","Compressor","Encoder", "ongoing"],
+    "repository": "https://github.com/kaif-00z/AutoAnimeBot",
+    "success_url": "https://t.me/BotsBakery",
+    "stack": "container",
+    "env": {
+        "SEND_SCHEDULE": {
+            "description": "Keep it True If You Want Anime Airing Time Else False.",
+            "value": "True",
+            "required": false
+        }
+    }
+}
