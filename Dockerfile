@@ -14,7 +14,7 @@ FROM python:3.9-slim
 
 WORKDIR /app
 
-COPY --from=builder /app/your_bot_script.py .
+COPY --from=builder /app/bot.py .
 
 # Entrypoint to run your bot script
 CMD ["python", "bot.py"]
