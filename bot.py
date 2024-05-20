@@ -1,5 +1,5 @@
 import telethon
-from telethon.tl.functions.messages import EditMessageReplyMarkup, EditMessageText
+from telethon.tl.functions.messages import EditMessageReplyMarkupRequest, EditMessageTextRequest
 from telethon.tl.types import InlineKeyboardButton, InlineKeyboardMarkup, Message
 
 # Replace with your Telegram API details
