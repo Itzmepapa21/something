@@ -19,13 +19,14 @@ async def edit_post(client, message):
         command, post_link, dual_link = message.text.split(maxsplit=2)
         if command == "/edit":
             try:
-                post = await client.get_messages(post_link)
-                message_id = post.message_id  # Access the first message's ID
+                # No need to extract chat ID from link anymore
+                post = await client.get_messages(chat_id=None, message_links=post_link)
+                message_id = post.message_id
                 post_buttons = post.reply_markup.inline_keyboard if post.reply_markup else None
                 dual_button = [InlineKeyboardButton("Dual", url=dual_link)]
                 new_buttons = [dual_button] + post_buttons if post_buttons else [dual_button]
                 await client.edit_message_reply_markup(
-                    chat_id=post.chat.id,
+                    chat_id=post.chat.id,  # Directly use chat.id from retrieved post
                     message_id=message_id,
                     reply_markup=InlineKeyboardMarkup(new_buttons)
                 )
