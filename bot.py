@@ -6,11 +6,21 @@ api_id = 21310924
 api_hash = 'fa4c3f582286d969ab1d08449e9533e8'
 bot_token = '7183078971:AAGinBsxYNnwiCvcu0X-YfL5zgiDkA74l0Q'
 
-app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
+app = Client(
+    "my_bot",
+    api_id=api_id,
+    api_hash=api_hash,
+    bot_token=bot_token,
+    use_tg_crypto=True  # Enable tgcrypto for faster speed
+)
 
 async def is_admin(client, chat_id, user_id):
-    chat_info = await client.get_chat_member(chat_id, user_id)
-    return chat_info.status in ['administrator', 'creator']
+    try:
+        chat_info = await client.get_chat_member(chat_id, user_id)
+        return chat_info.status in ['administrator', 'creator']
+    except Exception as e:
+        print(f"Error checking admin status: {e}")
+        return False
 
 @app.on_message(filters.forwarded & filters.private)
 async def forward_handler(client, message):
