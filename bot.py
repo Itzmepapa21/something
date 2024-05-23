@@ -20,10 +20,15 @@ async def edit_post(client, message):
         if command == "/edit":
             try:
                 post = await client.get_messages(post_link)
+                message_id = post.message_id  # Access the first message's ID
                 post_buttons = post.reply_markup.inline_keyboard if post.reply_markup else None
                 dual_button = [InlineKeyboardButton("Dual", url=dual_link)]
                 new_buttons = [dual_button] + post_buttons if post_buttons else [dual_button]
-                await client.edit_message_reply_markup(chat_id=post.chat.id, message_id=post.message_id, reply_markup=InlineKeyboardMarkup(new_buttons))
+                await client.edit_message_reply_markup(
+                    chat_id=post.chat.id,
+                    message_id=message_id,
+                    reply_markup=InlineKeyboardMarkup(new_buttons)
+                )
                 await message.reply("Post edited successfully!")
             except Exception as e:
                 await message.reply(f"Error editing post: {e}")
