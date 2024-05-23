@@ -8,19 +8,22 @@ bot_token = '7183078971:AAGinBsxYNnwiCvcu0X-YfL5zgiDkA74l0Q'
 
 app = Client("my_bot", api_id=api_id, api_hash=api_hash, bot_token=bot_token)
 
+async def is_admin(client, chat_id, user_id):
+    chat_info = await client.get_chat_member(chat_id, user_id)
+    return chat_info.status in ['administrator', 'creator']
+
 @app.on_message(filters.forwarded & filters.private)
 async def forward_handler(client, message):
     chat_id = message.forward_from_chat.id
     user_id = message.from_user.id
     
-    # Check if bot is admin in the forwarded channel
-    chat_info = await client.get_chat_member(chat_id, user_id)
-    if chat_info.status == 'administrator':
+    # Check if the user is admin or owner in the forwarded channel
+    if await is_admin(client, chat_id, user_id):
         # Ask for the link
         await message.reply_text("Please provide the link for the button.")
         app.registered_link = chat_id
     else:
-        await message.reply_text("You are not an admin in the forwarded channel.")
+        await message.reply_text("You are not an admin or owner in the forwarded channel.")
 
 @app.on_message(filters.private)
 async def link_handler(client, message):
