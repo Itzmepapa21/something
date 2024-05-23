@@ -1,68 +1,37 @@
 from pyrogram import Client, filters
-from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
-# Replace these values with your own
+# Replace these with your API_ID, API_HASH, and BOT_TOKEN
+API_ID = "your_api_id"
+API_HASH = "your_api_hash"
+BOT_TOKEN = "your_bot_token"
+
+# Define your admin user(s) IDs
+admin_ids = [7030439873, 6072442458, 987654321]
+
 api_id = 21310924
 api_hash = 'fa4c3f582286d969ab1d08449e9533e8'
 bot_token = '7183078971:AAGinBsxYNnwiCvcu0X-YfL5zgiDkA74l0Q'
 
-app = Client(
-    "my_bot",
-    api_id=api_id,
-    api_hash=api_hash,
-    bot_token=bot_token  # Enable tgcrypto for faster speed
-)
+app = Client("my_bot", api_id=API_ID, api_hash=API_HASH, bot_token=BOT_TOKEN)
 
-async def is_admin(client, chat_id, user_id):
-    try:
-        chat_info = await client.get_chat_member(chat_id, user_id)
-        return chat_info.status in ['administrator', 'creator']
-    except Exception as e:
-        print(f"Error checking admin status: {e}")
-        return False
-
-@app.on_message(filters.forwarded & filters.private)
-async def forward_handler(client, message):
-    chat_id = message.forward_from_chat.id
-    user_id = message.from_user.id
-    
-    # Check if the user is admin or owner in the forwarded channel
-    if await is_admin(client, chat_id, user_id):
-        # Ask for the link
-        await message.reply_text("Please provide the link for the button.")
-        app.registered_link = chat_id
+@app.on_message(filters.private & filters.user(admin_ids))
+async def edit_post(client, message):
+    if len(message.text.split()) >= 3:
+        command, post_link, dual_link = message.text.split(maxsplit=2)
+        if command == "/edit":
+            try:
+                post = await client.get_messages(post_link)
+                post_buttons = post.reply_markup.inline_keyboard if post.reply_markup else None
+                dual_button = [InlineKeyboardButton("Dual", url=dual_link)]
+                new_buttons = [dual_button] + post_buttons if post_buttons else [dual_button]
+                await client.edit_message_reply_markup(chat_id=post.chat.id, message_id=post.message_id, reply_markup=InlineKeyboardMarkup(new_buttons))
+                await message.reply("Post edited successfully!")
+            except Exception as e:
+                await message.reply(f"Error editing post: {e}")
+        else:
+            await message.reply("Invalid command. Please use /edit post_link dual_link")
     else:
-        await message.reply_text("You are not an admin or owner in the forwarded channel.")
-
-@app.on_message(filters.private)
-async def link_handler(client, message):
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    
-    if hasattr(app, 'registered_link') and user_id == app.registered_link:
-        link = message.text
-        await message.reply_text("Button link registered successfully.")
-        
-        # Edit the forwarded message in the channel
-        forwarded_message = await client.get_messages(app.registered_link, message.message_id)
-        buttons = []
-        
-        # Add the new "Dual" button
-        buttons.append([InlineKeyboardButton("Dual", url=link)])
-        
-        # Check if there are existing buttons in the message
-        if forwarded_message.reply_markup and forwarded_message.reply_markup.inline_keyboard:
-            buttons += forwarded_message.reply_markup.inline_keyboard
-        
-        # Create InlineKeyboardMarkup
-        reply_markup = InlineKeyboardMarkup(buttons)
-        
-        # Edit the message with the new buttons
-        await forwarded_message.edit_reply_markup(reply_markup)
-        
-        # Clear registered link
-        del app.registered_link
-    else:
-        await message.reply_text("You are not authorized to set the link.")
+        await message.reply("Invalid command. Please use /edit post_link dual_link")
 
 app.run()
