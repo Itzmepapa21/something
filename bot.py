@@ -10,8 +10,7 @@ app = Client(
     "my_bot",
     api_id=api_id,
     api_hash=api_hash,
-    bot_token=bot_token,
-    use_tg_crypto=True  # Enable tgcrypto for faster speed
+    bot_token=bot_token  # Enable tgcrypto for faster speed
 )
 
 async def is_admin(client, chat_id, user_id):
